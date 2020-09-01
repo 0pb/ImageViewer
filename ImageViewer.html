@@ -1,0 +1,50 @@
+<!doctype html>
+<!--
+*   ImageViewer.html  - Allow the user to read picture in nearby folder, in pure html/javascript (no server needed)
+*   Author        - 0pb
+*   Link          - https://github.com/0pb/ImageViewer
+*   LICENSE GNU V3
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="saya">
+    <title>test</title>
+
+    <!-- Custom styles for this template -->
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <link href="ImageViewer.css" rel="stylesheet">
+  </head>
+
+<body>
+<div class="container-fluid">
+    <main role="main" class="px-5">
+
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Image Reader</h1>
+        <button type="button" id="button_theme" class="btn btn-light">Dark theme</button>
+      </div>
+      <div class="pt-5 pb-5">
+        <h4><p id="top_title">Default title</p></h4>
+      </div>
+
+      <input type="file"class="pt-2 pb-2" id="filepicker" name="fileList" webkitdirectory multiple/>
+      <select id="menu" placeholder="Example">
+        <option>Example</option>
+      </select>
+
+      <div id="imagine" class="pt-5 pb-5">
+        <!--
+        <img src="file/1.jpg" alt="1">
+        -->
+      </div>
+
+    </main>
+  </div>
+</div>
+<script type="text/javascript" src="jquery-latest.min.js"></script>
+<script type="text/javascript" src="ImageViewer.js"></script>
+</body>
+</html>
