@@ -1,10 +1,9 @@
 # ImageViewer
 Read long string of picture, pure html/javascript/css (no nodejs, no server required, no installation required)
 
-![graph_exemple](show3.png)
-
 ## **Requirements**
 **No** Requirement/dependency needed
+
 **No** Installation required
 
 ## **How to use it**
@@ -85,6 +84,8 @@ I have yet to see any offline manga reader/image viewer that is small and doesn'
 ![Result_example1](example1.png)
 Result
 
+---
+
 ### Example 2 (multiples folders) : 
 
 ```bash
@@ -104,8 +105,12 @@ Result
 ![Result_example2](example2.png)
 Result
 
+---
+
 ### How the picture are displayed one after another : 
 ![pagination](pagination.png)
+
+---
 
 ### Light theme / dark theme : 
 ![theme](example3.png)
