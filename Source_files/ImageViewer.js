@@ -42,9 +42,9 @@ function print_picture(dict_file, top_directory)
     console.log("Print the page");
     for (var key in dict_file) 
     {  
+        var value = dict_file[key].sort(function(a,b){a = a.split('.')[0]; b = b.split('.')[0]; return a - b;});
         // sort in 1 2 3 order
-        for (var i in dict_file[key].sort(function(a,b) { 
-                            a = a.split('.')[0]; b = b.split('.')[0]; return a - b; })) 
+        for (var i in value) 
         {
             if (top_directory === key)
             {
@@ -86,7 +86,7 @@ function add_option_in_menu(dict_file)
         // <option selected> this </option>
     }
     console.groupEnd();
-}
+};
 
 
 
@@ -95,10 +95,10 @@ function get_select_option()
 *   Self-explanatory : Get the selected option in the select menu
 */
 {
-    selected_option = document.getElementById("menu").options[document.getElementById('menu').selectedIndex].text
-    console.info("Option selected : " + selected_option)
+    selected_option = document.getElementById("menu").options[document.getElementById('menu').selectedIndex].text;
+    console.info("Option selected : " + selected_option);
     return selected_option;
-}
+};
 
 
 
@@ -113,7 +113,7 @@ function true_if_simple_folder(files)
 {
     path = files[0]["webkitRelativePath"];
     file_name = path.split("/");
-    console.log(path, file_name)
+    console.log(path, file_name);
     try
     {
         if (file_name[2].endsWith(".jpg") || file_name[2].endsWith(".png"))
@@ -126,7 +126,7 @@ function true_if_simple_folder(files)
         // in this case we return true
         return true;
     }
-}
+};
 
 
 
@@ -154,7 +154,7 @@ function file_picker()
             ..
         └── code.js
 
-    Valid : 
+    NOT valid : 
     repository/
         ├── folder/
                 └──folder_selected_by_user/
@@ -189,14 +189,14 @@ function file_picker()
         console.group("Get files and folders");
         let files = event.target.files;
 
-        console.log(files)
+        console.log(files);
         top_directory = files[0]["webkitRelativePath"].split("/");
-        top_directory = top_directory[0]
+        top_directory = top_directory[0];
 
         var test = true_if_simple_folder(files);
-        console.log("true_if_simple_folder : " + test)
+        console.log("true_if_simple_folder : " + test);
 
-        console.log("Create folder name dictionnary")
+        console.log("Create folder name dictionnary");
         if (test)
         {
             dict[top_directory] = [] ;
@@ -207,7 +207,7 @@ function file_picker()
                 let file_name = path.split("/");
                 dict[top_directory].push(file_name[1]);
             }
-            add_option_in_menu(dict)
+            add_option_in_menu(dict);
             load_and_print_pictures(dict, top_directory);
         }
         else 
@@ -222,7 +222,7 @@ function file_picker()
             }
 
             // recover the file name and them into the corresponding key (folder name) in the dict
-            console.time("Get every file into list")
+            console.time("Get every file into list");
             for (let i=0; i<files.length; i++) 
             {
                 try 
@@ -239,17 +239,17 @@ function file_picker()
                     console.warn("Some folder were empty or didn't contain pictures");
                 }
             }
-            console.timeEnd("Get every file into list")
+            console.timeEnd("Get every file into list");
 
-            console.log("Change the menu with the new folder name")
-            add_option_in_menu(dict)
+            console.log("Change the menu with the new folder name");
+            add_option_in_menu(dict);
             load_and_print_pictures(dict, top_directory);
         }
         console.groupEnd();
     }, false);
 
-    return { dict, top_directory }
-}
+    return { dict, top_directory };
+};
 
 
 
@@ -270,18 +270,18 @@ function load_and_print_pictures(dict, top_directory)
     for (var key in dict) 
     { 
         selected_option_without_doublespace = key.replace(/ +(?= )/g,'');
-        var dict_copy = {}
+        var dict_copy = {};
         if (selected_option === selected_option_without_doublespace)
         {   
-            dict_copy[key] = dict[key]
+            dict_copy[key] = dict[key];
             print_picture(dict_copy, top_directory);
             $("#top_title").empty().append(key);
         }
     }
-    console.timeEnd("Load every path and file name")
-    console.log("Printing and loading done")
+    console.timeEnd("Load every path and file name");
+    console.log("Printing and loading done");
     console.groupEnd();
-}
+};
 
 
 
@@ -309,7 +309,7 @@ function arrow_key()
                 break;
         }
     };
-}
+};
 
 
 
@@ -322,11 +322,11 @@ function Change_theme()
     button_theme.onclick = function(event) 
     {   
         if (true_if_light_theme)
-            Dark_theme();
+            {Dark_theme();}
         else
-            Light_theme();
+            {Light_theme();}
         true_if_light_theme = !true_if_light_theme;
-    }
+    };
 
     function Dark_theme() 
     {
@@ -337,7 +337,7 @@ function Change_theme()
 
        document.getElementById("button_theme").className = "btn btn-light";
        document.getElementById("button_theme").innerHTML = "Light theme";
-    }
+    };
 
     function Light_theme() 
     {
@@ -348,13 +348,12 @@ function Change_theme()
 
        document.getElementById("button_theme").className = "btn btn-dark";
        document.getElementById("button_theme").innerHTML = "Dark theme";
-    }
-}
+    };
+};
 
 
 
-$(document).ready( 
-    function() 
+$(document).ready(function() 
     /*
     *   Self-explanatory
     */
