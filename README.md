@@ -11,7 +11,7 @@ Read long string of picture, pure html/javascript/css (no nodejs, no server requ
 
 - Copy the files inside the folder "source_files" and put them next to your repository with the pictures.
 
-- Copy the file ["ImageViewer_onefile.html"](ImageViewer_onefile.html) next to a folder containing picture and it's done ! Just click on the html file, then on "browse" and then the folder containing the picture.
+- Copy the file ["ImageViewer_onefile.html"](https://github.com/0pb/ImageViewer/raw/master/ImageViewer_onefile.html) next to a folder containing picture and it's done ! Just click on the html file, then on "browse" and then the folder containing the picture.
 
 
 
