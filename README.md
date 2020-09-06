@@ -2,9 +2,9 @@
 Read long string of picture, pure html/javascript/css (no nodejs, no server required, no installation required). Useful for reading manga as an example.
 
 ## **Requirements**
-**No** Requirement/dependency needed
+**No** Requirement/dependency needed.
 
-**No** Installation required
+**No** Installation required.
 
 ## **How to use it**
 2 possibility : 

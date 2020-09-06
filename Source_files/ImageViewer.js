@@ -1,323 +1,16 @@
 /*
 *   ImageViewer.js  - Allow the user to read picture in nearby folder, in pure html/javascript (no server needed)
-*   Author   - 0pb
-*   Link     - https://github.com/0pb/ImageViewer
+*   @Author         - 0pb
+*   Link            - https://github.com/0pb/ImageViewer
 *   LICENSE GNU V3
 */
 
 
-
-function print_picture(dict_file, top_directory) 
-/*
-*   Print the picture one next under another.
-*   Sort the name of the file (there is no need to sort file before printing them), 
-*       files are sorted trought alphabetical sort.
-*   Use a condition to check if it's a "single folder" or "multiples folder" :
-*
-*   single folder = 
-    top_folder/
-        ├── 1.jpg
-        ├── 2.jpg
-        └── 3.jpg
-
-    multiple folder = 
-    top_folder/
-        ├── gallery_1/
-                ├── 1.jpg
-                └── 2.jpg
-        ├── gallery_2/
-                └── 1.jpg
-        └── gallery_3/
-                ├── 1.jpg
-                ├── 2.jpg
-                └── 3.jpg
-*/
+function Change_theme()
 {
-    console.group("Priting");
-    console.log("Top directory : " + top_directory);
-
-    console.log("Clean the page");
-    $("#imagine").empty();
-
-    console.log("Print the page");
-    for (var key in dict_file) 
-    {  
-        var value = dict_file[key].sort(function(a,b){a = a.split('.')[0]; b = b.split('.')[0]; return a - b;});
-        // sort in 1 2 3 order
-        for (var i in value) 
-        {
-            if (top_directory === key)
-            {
-                $("#imagine").append('<img src="' 
-                                    + key + '/' 
-                                    + dict_file[key][i] + '" alt="' 
-                                    + i + '">');
-            }
-            else
-            {
-                $("#imagine").append('<img src="' 
-                                    + top_directory + '/' 
-                                    + key + '/' 
-                                    + dict_file[key][i] + '" alt="' 
-                                    + i + '">');
-            }
-        }
-    }
-    console.groupEnd();
-};
-
-
-
-function add_option_in_menu(dict_file) 
-/*
-*   Add every option in the dictionnary to the menu
-*   It doesn't clean the menu in case of a single folder (bug)
-*/
-{
-    console.group("Select menu change");
-
-    console.log("Clean the menu");
-    $("#menu").empty();
-
-    console.log("Add all the menu options");
-    for (var image_group_name in dict_file) 
-    { 
-        $("#menu").append('<option>' + image_group_name + '</option>');
-        // <option selected> this </option>
-    }
-    console.groupEnd();
-};
-
-
-
-function get_select_option() 
-/*
-*   Self-explanatory : Get the selected option in the select menu
-*/
-{
-    selected_option = document.getElementById("menu").options[document.getElementById('menu').selectedIndex].text;
-    console.info("Option selected : " + selected_option);
-    return selected_option;
-};
-
-
-
-function true_if_simple_folder(files)  
-/*
-*   Check in naive way if there is only one folder
-*   Get the first element found in the dict, then check if the first "thing" inside the 
-*       first element is a jpg or png
-*   return false if the "thing" is not a jpg or png (because it assume it is a folder)
-*   return true otherwise
-*/
-{
-    path = files[0]["webkitRelativePath"];
-    file_name = path.split("/");
-    console.log(path, file_name);
-    try
-    {
-        if (file_name[2].endsWith(".jpg") || file_name[2].endsWith(".png"))
-        {
-            //do nothing
-        }
-        return false;
-    } catch (TypeError) {
-        // The typeError come from file_name not being an array in case of a simple folder
-        // in this case we return true
-        return true;
-    }
-};
-
-
-
-function file_picker()
-/*
-*   Use the filesystem API given by the browser : 
-*   Get the path and sub-path of every file/folder of the repertory that the user selected
-
-    folder_selected_by_user/
-        ├── gallery_1/
-                ├── 1.jpg
-                └── 2.jpg
-        └── gallery_2/
-                └── 1.jpg
-
-*   Doesn't check if the file/folder is valid
-*   The folder_selected_by_user is saved in a variable, so it can be used later for the path
-*       due to how the API works, the folder_selected_by_user need to be either one level 
-*       below where the Image Reader files are placed, or directly next to it.
-*
-    Valid : 
-    repository/
-        ├── folder_selected_by_user/
-        ├── index.html
-            ..
-        └── code.js
-
-    NOT valid : 
-    repository/
-        ├── folder/
-                └──folder_selected_by_user/
-        ├── index.html
-            ..
-        └── code.js
-    
-    NOT valid : 
-    repository/
-        ├── folder_selected_by_user/
-        └── folder/
-                ├── index.html
-                    ..
-                └── code.js
-
-    NOT valid : 
-    repository/
-        ├── folder/
-                └──folder_selected_by_user/
-        └── folder/
-                ├── index.html
-                    ..
-                └── code.js
-
-*/
-{   
-    dict = {};
-    top_directory = "";
-    // Get the file and folder
-    document.getElementById("filepicker").addEventListener("change", function(event) 
-    {
-        console.group("Get files and folders");
-        let files = event.target.files;
-
-        console.log(files);
-        top_directory = files[0]["webkitRelativePath"].split("/");
-        top_directory = top_directory[0];
-
-        var test = true_if_simple_folder(files);
-        console.log("true_if_simple_folder : " + test);
-
-        console.log("Create folder name dictionnary");
-        if (test)
-        {
-            dict[top_directory] = [] ;
-            // take every folder name and put it into a list
-            for (let i=0; i<files.length; i++) 
-            {
-                let path = files[i]["webkitRelativePath"];
-                let file_name = path.split("/");
-                dict[top_directory].push(file_name[1]);
-            }
-            add_option_in_menu(dict);
-            load_and_print_pictures(dict, top_directory);
-        }
-        else 
-        {
-            // take every folder name and put it into a list
-            for (let i=0; i<files.length; i++) 
-            {
-                let path = files[i]["webkitRelativePath"];
-                let file_name = path.split("/");
-
-                dict[file_name[1]] = [] ;
-            }
-
-            // recover the file name and them into the corresponding key (folder name) in the dict
-            console.time("Get every file into list");
-            for (let i=0; i<files.length; i++) 
-            {
-                try 
-                {
-                    let path = files[i]["webkitRelativePath"];
-                    let file_name = path.split("/");
-                    if (file_name[2].endsWith(".jpg") || file_name[2].endsWith(".png"))
-                    {
-                        dict[file_name[1]].push(file_name[2]);
-                    }
-                } catch (TypeError) 
-                {
-                    // try/catch required as some folder may not contain picture
-                    console.warn("Some folder were empty or didn't contain pictures");
-                }
-            }
-            console.timeEnd("Get every file into list");
-
-            console.log("Change the menu with the new folder name");
-            add_option_in_menu(dict);
-            load_and_print_pictures(dict, top_directory);
-        }
-        console.groupEnd();
-    }, false);
-
-    return { dict, top_directory };
-};
-
-
-
-function load_and_print_pictures(dict, top_directory)  
-/*
-*   Get the selected option, then find a path with a similar name.
-*   Due to html, any doublespace are removed when put inside the selected option menu
-*   A check is done against a var containing every option without doublespace
-*   If the check is true, it mean that we reach the path with the same name as in the
-*       selected
-*/
-{
-    console.group("Load and print the picture");
-
-    var selected_option = get_select_option();
-
-    console.time("Load every path and file name");
-    for (var key in dict) 
-    { 
-        selected_option_without_doublespace = key.replace(/ +(?= )/g,'');
-        var dict_copy = {};
-        if (selected_option === selected_option_without_doublespace)
-        {   
-            dict_copy[key] = dict[key];
-            print_picture(dict_copy, top_directory);
-            $("#top_title").empty().append(key);
-        }
-    }
-    console.timeEnd("Load every path and file name");
-    console.log("Printing and loading done");
-    console.groupEnd();
-};
-
-
-
-function arrow_key()  
-/*
-*   Check for right or left arrow keydown, then focus the menu and change the 
-*       selected option one next step (right arrow) or previous step (left arrow)
-*   Doesn't always work in the middle of a page (only focus the menu without changing
-*       the current selected option)
-*/
-{
-    document.onkeydown = function(event) 
-    {   
-        switch (event.keyCode) 
-        {   
-            case 37:
-                document.getElementById("menu").focus();
-                var select = document.getElementById('menu');
-                select = select.selectedIndex - 1;
-                break;
-            case 39:    
-                document.getElementById("menu").focus();      
-                var select = document.getElementById('menu');
-                select = select.selectedIndex + 1;
-                break;
-        }
-    };
-};
-
-
-
-function Change_theme() 
-/*
-*   Self-explanatory
-*/
-{
+    /*
+    * Change the theme depending on the current theme
+    */ 
     var true_if_light_theme = true;
     button_theme.onclick = function(event) 
     {   
@@ -328,50 +21,410 @@ function Change_theme()
         true_if_light_theme = !true_if_light_theme;
     };
 
+    docbody = document.body.style;
+    docmenu = document.getElementById("menu").style;
+    docbutton = document.getElementById("button_theme");
     function Dark_theme() 
     {
-       document.body.style.background = "#525252";
-       document.body.style.color = "#ca3e47";
-       document.getElementById("menu").style.background = "#ca3e47";
-       document.getElementById("menu").style.color = "#414141";
+       docbody.background = "#525252";
+       docbody.color = "#ca3e47";
+       docmenu.background = "#ca3e47";
+       docmenu.color = "#414141";
 
-       document.getElementById("button_theme").className = "btn btn-light";
-       document.getElementById("button_theme").innerHTML = "Light theme";
+       docbutton.className = "btn btn-light";
+       docbutton.innerHTML = "Light theme";
     };
 
     function Light_theme() 
     {
-       document.body.style.background = "#FFFFFF";
-       document.body.style.color = "#808080";
-       document.getElementById("menu").style.background = "#c0392b";
-       document.getElementById("menu").style.color = "white";
+       docbody.background = "#FFFFFF";
+       docbody.color = "#808080";
+       docmenu.background = "#c0392b";
+       docmenu.color = "white";
 
-       document.getElementById("button_theme").className = "btn btn-dark";
-       document.getElementById("button_theme").innerHTML = "Dark theme";
+       docbutton.className = "btn btn-dark";
+       docbutton.innerHTML = "Dark theme";
     };
 };
 
 
 
-$(document).ready(function() 
+function true_if_unique_folder(
+    /* list[dictionnary] */ files)
+{
     /*
-    *   Self-explanatory
+    * @param (list) files {name, lastModified, webkitRelativePath}
+    * @return (bool) True if the folder is a unique folder
+
+        unique folder = 
+        top_folder/
+            ├── 1.jpg
+            ├── 2.jpg
+            └── 3.jpg
+
+        multiple folder = 
+        top_folder/
+            ├── gallery_1/
+            │       ├── 1.jpg
+            │       └── 2.jpg
+            ├── gallery_2/
+            │       └── 1.jpg
+            └── gallery_3/
+                    ├── 1.jpg
+                    ├── 2.jpg
+                    └── 3.jpg
+
     */
-    {
-        // allow the filepicker to be clicked on
-        value = file_picker();
-
-        dict = value.dict;
-        top_directory = value.top_directory;
-
-        // Change the picture each time a new title in the menu list is selected
-        menu.onchange = function() 
+    for (let i=0; i<files.length; i++) 
+    {   
+        path = (files[i].webkitRelativePath).split("/");
+        if (path.length>2)
         {
-            load_and_print_pictures(dict, top_directory);
-        };
+            return false;
+        }
+    }
+    return true;
+};
 
-        // allow navigation with left and right arrow
-        arrow_key();
+
+
+function print_picture(
+    /* list[string] */ array_of_file) 
+{
+    /*
+    * @param (list) array_of_file contain every path within a folder.
+    */
+    function modify_html(
+        /* list[string] */ sorted_array_of_file)
+    {
+        /*
+        * Clean the imagine div (which may already contain picture), then append an 
+        * image with every path in the list.
+        * It then change the title to the folder name.
+        * Example of path : "Artist (example)/1234-1.jpg"
+        *                   "Artist (example)/second_folder/8132-3.jpg"
+        *
+        * @param (list) sorted_array_of_file contain every path but sorted by filename.
+        */
+        $("#imagine").empty();
+        for (let i=0; i<value.length; i++) 
+        {
+            $("#imagine").append('<div id="img'
+                                + i + '"  class="wrapper_image" tabindex="0"><img src="'
+                                + value[i] + '" alt="' 
+                                + i + '"></div>'); 
+        }
+        let folder_name = sorted_array_of_file[0].split("/");
+        folder_name = folder_name[folder_name.length - 2];
+        $("#top_title").empty().append(folder_name);        
+    };
+
+    console.group("Priting");
+    var value = array_of_file.sort(
+        function(a,b){  a = a.split('.')[0]; 
+                        b = b.split('.')[0]; 
+                        return a - b;});
+    modify_html(value);
+    console.groupEnd();
+};
+
+
+
+function load_and_print_pictures(
+    /* dict[key][list[str]] */ dict)
+{
+    /*
+    * Example : {"Artist (example)" : ["Artist (example)/1234-1.jpg"
+    *                                , "Artist (example)/1234-2.jpg"
+    *                                , "Artist (example)/1234-3.jpg"]}
+    *
+    * @param (dict) dict contain every folder, then a list of file within that folder.
+    */
+    console.group("Loading the folder");
+
+    function trim_double_space(string)
+    {
+        /*
+        * When value are put in the html, every double space (or more) are automatically
+        * removed. However this is not the case in the dictionnary, that's why this function
+        * is used to compare the html string of the selected option with the value inside
+        * the dictionnary.
+        *
+        * @param (string) string contain the original folder name
+        * @return (string) string that contain the folder name trimmed
+        */
+        return string.split(/\s+/).join(' ');
+    }
+
+    function get_select_option() 
+    {
+        /*
+        * @return (string) string that contain the selected option (by the user) in the menu.
+        */
+        selected_option = document.getElementById("menu")
+                .options[document.getElementById('menu').selectedIndex]
+                .text;
+        return selected_option;
+    };
+
+    console.time("Load every path and file name");
+    for (var key in dict) 
+    { 
+        if (get_select_option() === trim_double_space(key))
+        {   
+            print_picture(dict[key]);
+        }
+    }
+    console.timeEnd("Load every path and file name");
+    console.groupEnd();
+};
+
+
+
+function dict_unique(
+    /* list[dictionnary] */ files)
+{
+    /*
+    * Used in case of a unique folder selected by the user. The script cannot react the same way
+    * to multiples folders and unique folder.
+    *
+    * @param (list) files {name, lastModified, webkitRelativePath}
+    * @return (dict) dictionnary that contain every folder, then a list of file within that folder.
+    */
+    top_directory = files[0].webkitRelativePath.split("/")[0];
+    dict = {};
+    dict[top_directory] = [] ;
+    for (let i=0; i<files.length; i++) 
+    {  
+        let path = files[i].webkitRelativePath;
+        if (    path.endsWith(".jpg") 
+             || path.endsWith(".jpeg") 
+             || path.endsWith(".png"))
+        {
+            dict[top_directory].push(path);
+        }
+    }
+    return dict;
+};
+
+
+
+function dict_multiples(
+    /* list[dictionnary] */ files)
+{
+    /*
+    * Used in case of multiple folders selected by the user. The script cannot react the same way
+    * to multiples folders and unique folder.
+    *
+    * @param (list) files {name, lastModified, webkitRelativePath}
+    * @return (dict) dictionnary that contain every folder, then a list of file within that folder.
+    */
+    dict = {};
+    for (let i=0; i<files.length; i++) 
+    {
+        let folder_name = files[i].webkitRelativePath.split("/");
+        folder_name = folder_name[folder_name.length - 2];
+        dict[folder_name] = [];
+    }
+
+    for (let i=0; i<files.length; i++) 
+    {
+        let path = files[i].webkitRelativePath;
+        let folder_name = files[i].webkitRelativePath.split("/");
+        folder_name = folder_name[folder_name.length - 2];     
+        if (    path.endsWith(".jpg") 
+             || path.endsWith(".jpeg") 
+             || path.endsWith(".png"))
+        {
+            dict[folder_name].push(path);
+        }
+    }
+    return dict;
+};
+
+
+function add_option_in_menu(
+    /* dict[key][list[str]] */ dict) 
+{
+    /*
+    * Add every option to the select menu.
+    *
+    * @param (dict) dict contain every folder, then a list of file within that folder.
+    */
+    $("#menu").empty();
+    for (var folder_name in dict) 
+    { 
+        $("#menu").append('<option>' + folder_name + '</option>');
+    }
+};
+
+
+
+function execute_main(event)
+{
+    /*
+    * Use the filesystem API given by the browser : 
+    * Get the path and sub-path of every file/folder of the repertory that the user selected
+    * It then print every picture to the screen.
+
+        folder_selected_by_user/
+            ├── gallery_1/
+            │       ├── 1.jpg
+            │       └── 2.jpg
+            └── gallery_2/
+                    └── 1.jpg
+
+    * Due to how the API works, the folder_selected_by_user need to be either one level 
+    * below where the Image Reader files are placed, or directly next to it.
+
+        Valid : 
+        repository/
+            ├── folder_selected_by_user/
+            ├── index.html
+            │   ..
+            └── code.js
+
+        NOT valid : 
+        repository/
+            ├── folder/
+            │       └──folder_selected_by_user/
+            ├── index.html
+            │   ..
+            └── code.js
+        
+        NOT valid : 
+        repository/
+            ├── folder_selected_by_user/
+            └── folder/
+                    ├── index.html
+                    │   ..
+                    └── code.js
+
+        NOT valid : 
+        repository/
+            ├── folder/
+            │       └──folder_selected_by_user/
+            └── folder/
+                    ├── index.html
+                    │   ..
+                    └── code.js
+    */
+    console.group("Get files and folders");
+    let files = event.target.files;
+
+    if (true_if_unique_folder(files))
+    {
+        dict = dict_unique(files);
+    }
+    else
+    {
+        dict = dict_multiples(files); 
+    }
+    add_option_in_menu(dict);
+    load_and_print_pictures(dict);
+
+    console.groupEnd();
+    return dict;
+};
+
+
+
+function event_manager()
+{   
+    /*
+    * Manage the event :
+    * When the filepicker is changed, it execute the function that load and display all the picture
+    * after loading them in a dictionnary.
+    *
+    * When the select menu is changed, it execute the function that load and display all the picture
+    * by using the dictionnary already loaded by the filepicker.
+    *
+    * When the left arrow or right arrow are pressed, the next picture is focused.
+    * TODO : On reaching last picture, the right arrow would load the next folder in the dictionnary
+    *        Same for reaching first picture and previous folder.
+    */
+    var dict;
+    var i = 0;
+    var list_node;
+    filepicker.onchange = function()
+    {   
+        dict = execute_main(event);
+        current_i = i;
+        list_node = document.getElementsByClassName("wrapper_image");
+    };
+
+    menu.onchange = function() 
+    {   
+        load_and_print_pictures(dict);
+        current_i = i;
+        list_node = document.getElementsByClassName("wrapper_image");
+    };
+
+    document.onkeydown = function()
+    {
+        current_i = function_arrow(event, list_node, current_i);
+        console.error(current_i);
+    }
+};
+
+
+
+function function_arrow(event, list_node, value)  
+{
+    /*
+    * Change the focus depending on the left and right arrow input.
+    * TODO : get the current picture printed on screen instead of the last user input.
+    *        Current behavior : if the user use the arrow then the mousewheel, then re-use the arrow, 
+    *        it will go back to where the focus was last. Can be annoying when using the left arrow for
+    *        the first time in the folder.
+    *
+    * @param (list) list_node contain every <img> tag that are currently printed.
+    * @param (number) value contain the index of the picture last on focus.
+    */
+    var i = value;
+    var increment = 1;
+
+    switch (event.keyCode) 
+    {   
+        case 37:
+            if (i-increment < 0) 
+            {
+                i = 0;
+            }
+            else
+            {
+                i = i - increment;
+            }
+            break;
+        case 39: 
+            if (i + increment >= list_node.length-1) 
+            {
+                i = list_node.length - increment;
+            }
+            else
+            {
+                i = i + increment; 
+            }
+            break;
+    }
+    list_node[i].focus();
+    list_node[i].blur();
+    console.log(list_node[i]);
+    return i;
+};
+
+
+
+$(document).ready(function() 
+    {
+        /* root of the script
+        var scripts = document.getElementsByTagName("script");
+        src = scripts[0].src;
+        console.log(src);
+        */
+
+        // allow the filepicker to be clicked on
+        event_manager();
 
         // allow the theme change
         Change_theme();
